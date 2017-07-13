@@ -1,6 +1,24 @@
+frequency
+<input type="range" id="fIn" min="40" max="6000" value="400" oninput="show()" />
+<span id="fOut"></span><br>
+type
+<input type="range" id="tIn" min="0" max="3" value="0" oninput="show()" />
+<span id="tOut"></span><br>
+volume
+<input type="range" id="vIn" min="0" max="100" value="5" oninput="show()" />
+<span id="vOut"></span><br>
+duration
+<input type="number" id="dIn" value="500" oninput="show()" />
+ms<br>
+interval
+<input type="number" id="iIn" value="20000" oninput="show()" />
+ms<br>
+<button onclick='beep();'>Play</button>
+
 <script>
 audioCtx = new(window.AudioContext || window.webkitAudioContext)();
 
+timer = null;
 show();
 
 function show() {
@@ -19,42 +37,32 @@ function show() {
   document.getElementById("vOut").innerHTML = volume;
 
   duration = document.getElementById("dIn").value;
-  document.getElementById("dOut").innerHTML = duration + ' ms';
+
+  interval = document.getElementById("iIn").value;
 }
 
 function beep() {
+ if( timer != null ) clearInterval( timer );
+ timer = setInterval(function() {
   var oscillator = audioCtx.createOscillator();
   var gainNode = audioCtx.createGain();
-
+  
   oscillator.connect(gainNode);
   gainNode.connect(audioCtx.destination);
 
   gainNode.gain.value = volume;
   oscillator.frequency.value = frequency;
   oscillator.type = type;
-
+  
   oscillator.start();
 
   setTimeout(
-    function() {
-      oscillator.stop();
-    },
-    duration
+   function() {
+    oscillator.stop();
+   },
+  duration
   );
+ 
+ }, interval );
 };
 </script>
-
-frequency
-<input type="range" id="fIn" min="40" max="6000" oninput="show()" />
-<span id="fOut"></span><br>
-type
-<input type="range" id="tIn" min="0" max="3" oninput="show()" />
-<span id="tOut"></span><br>
-volume
-<input type="range" id="vIn" min="0" max="100" oninput="show()" />
-<span id="vOut"></span><br>
-duration
-<input type="range" id="dIn" min="1" max="5000" oninput="show()" />
-<span id="dOut"></span>
-<br>
-<button onclick='beep();'>Play</button>
